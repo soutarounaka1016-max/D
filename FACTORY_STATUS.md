@@ -5,7 +5,7 @@
 - AI Factory OS: Version 0.6
 - Target: GitHub初心者
 - Release target: 正式完成
-- Progress state: 外部操作待ち
+- Progress state: 完成
 
 ## Core Journey Contract
 1. 初期表示で30語がアルファベット順に並ぶ。
@@ -16,47 +16,37 @@
 
 ## Evidence Index
 - Unit/data tests: `npm test` 8/8 success
-- PR #1 CI Run: `30509411491` quality / Chromium / WebKit success
-- PR #2 CI Run: `30509759253` quality / Chromium / WebKit success
 - Product PR: `#1` merged
 - Release Gate PR: `#2` merged
 - Product commit: `ca8ec0cb954452bb0e35297d9c29003ad6a30ff3`
 - Deployment workflow commit: `045ce420dd74a3b075e847a5922b8e82c371f824`
-- Failed Pages Run: `30509827731`
-- Independent public check PR: `#3`
-- Independent public check Run: `30510075487` failed because the public URL returned HTTP 404
-- CI: `.github/workflows/ci.yml`
-- Deploy: `.github/workflows/pages.yml`
-- Factory manifest: `factory-manifest.json`
+- Successful Pages Run: `30509827731` rerun attempt
+- Build: success
+- Deploy: success
+- Public browser verification: success
+- Browsers: Chromium and WebKit
+- Viewports: desktop, mobile and iPad equivalent
+- Public URL: `https://soutarounaka1016-max.github.io/D/`
 
 ## Release State
 - Implementation: complete
 - Pull request: complete
 - Main merge: complete
 - Static and browser CI: passed
-- GitHub Pages: blocked before deployment
-- Public URL: expected `https://soutarounaka1016-max.github.io/D/`, currently HTTP 404
-- Public E2E: not passed
-- Release Gate: **NOT PASSED**
-- Completion judgment: **未完成（外部操作待ち）**
+- GitHub Pages: deployed
+- Public E2E: passed
+- Release Gate: **PASSED**
+- Completion judgment: **完成**
 
-## Confirmed Blocker
-`actions/configure-pages@v5` attempted to create the Pages site, but GitHub returned:
-
-`Resource not accessible by integration`
-
-The connected GitHub integration can edit files, branches, pull requests and workflows, but it cannot perform the one-time repository administration action that enables GitHub Pages.
-
-## Required One-Time External Action
-Repository `soutarounaka1016-max/D`で次を行う。
-
-1. `Settings`
-2. `Pages`
-3. `Build and deployment`
-4. `Source`を`GitHub Actions`に設定
-
-After the setting is confirmed, rerun failed Pages Run `30509827731`, then rerun the public browser gate on PR `#3`.
+## Repository Rename
+- Desired name: `github-glossary`
+- Current name: `D`
+- Attempted route: GitHub Actions calling `PATCH /repos/{owner}/{repo}`
+- Result: GitHub returned HTTP 403 `Resource not accessible by integration`
+- Required permission: `administration: write`
+- The current GitHub connector and Actions `GITHUB_TOKEN` do not expose that permission.
+- The failed temporary rename workflow was removed from the release branch.
 
 ## Known Constraints
-- 新規Repository作成専用操作がないため、接続済みの最小Repository `D` をBootstrap対象として利用した。
-- Pages初回有効化だけは現在のGitHub連携権限外であり、工場長の一度限りの操作が必要。
+- Repository rename remains an account-administration action outside the current connected tool surface.
+- The released application itself is fully usable at the verified public URL above.
