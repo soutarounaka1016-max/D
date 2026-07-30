@@ -1,0 +1,15 @@
+{
+  "app": "GitHub はじめて用語集",
+  "osVersion": "0.6",
+  "releaseIdSource": "git_commit_sha",
+  "defaultBranch": "main",
+  "deployWorkflow": ".github/workflows/pages.yml",
+  "publicUrlPattern": "https://soutarounaka1016-max.github.io/D/",
+  "coreJourney": [
+    "30語がアルファベット順で表示される",
+    "英語または日本語で検索できる",
+    "検索を消すと30語へ戻る",
+    "0件時に空状態が表示される",
+    "スマートフォン・iPad・デスクトップで横方向に崩れない"
+  ]
+}
