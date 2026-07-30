@@ -21,13 +21,14 @@ jobs:
           node-version: 22
       - name: Run data and search tests
         run: npm test
-      - name: Validate static entry files
+      - name: Validate static entry files and Python syntax
         run: |
           test -f index.html
           test -f styles.css
           test -f app.js
           test -f glossary.js
           grep -q 'GitHub はじめて用語集' index.html
+          python3 -m py_compile browser_test.py public_browser_test.py
 
   browser:
     runs-on: ubuntu-latest
