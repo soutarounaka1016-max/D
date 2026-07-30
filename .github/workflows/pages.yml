@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: pages
@@ -40,7 +41,74 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  verify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    env:
+      PUBLIC_URL: ${{ needs.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install Playwright
+        run: |
+          python -m pip install playwright==1.57.0
+          python -m playwright install --with-deps chromium webkit
+      - name: Verify the public URL in Chromium and WebKit
+        run: python public_browser_test.py
+
+  report:
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [build, deploy, verify]
+    env:
+      BUILD_RESULT: ${{ needs.build.result }}
+      DEPLOY_RESULT: ${{ needs.deploy.result }}
+      VERIFY_RESULT: ${{ needs.verify.result }}
+      PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+    steps:
+      - name: Report deployment evidence to the associated pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const associated = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: context.sha
+            });
+            const pull = associated.data[0];
+            const status = process.env.VERIFY_RESULT === 'success' ? 'PASS' : 'NOT PASSED';
+            const pageUrl = process.env.PAGE_URL || '(URL unavailable)';
+            const body = [
+              '## GitHub Pages Release Gate',
+              `- Release Gate: **${status}**`,
+              `- Build: **${process.env.BUILD_RESULT}**`,
+              `- Deploy: **${process.env.DEPLOY_RESULT}**`,
+              `- Public browser verification: **${process.env.VERIFY_RESULT}**`,
+              `- Public URL: ${pageUrl}`,
+              `- Commit: \`${context.sha}\``,
+              `- Workflow run: https://github.com/${owner}/${repo}/actions/runs/${context.runId}`
+            ].join('\n');
+
+            if (pull) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pull.number,
+                body
+              });
+            } else {
+              core.notice(body);
+            }
