@@ -4,7 +4,8 @@
   "releaseIdSource": "git_commit_sha",
   "defaultBranch": "main",
   "deployWorkflow": ".github/workflows/pages.yml",
-  "publicUrlPattern": "https://soutarounaka1016-max.github.io/D/",
+  "repository": "soutarounaka1016-max/github-glossary",
+  "publicUrlPattern": "https://soutarounaka1016-max.github.io/github-glossary/",
   "coreJourney": [
     "30語がアルファベット順で表示される",
     "英語または日本語で検索できる",
