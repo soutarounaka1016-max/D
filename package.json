@@ -1,0 +1,11 @@
+{
+  "name": "github-beginner-glossary",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test.mjs",
+    "test:browser": "python3 browser_test.py",
+    "check": "npm test && npm run test:browser"
+  }
+}
