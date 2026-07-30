@@ -9,8 +9,39 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
+  deployment-diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print recent main Pages runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'pages.yml',
+              branch: 'main',
+              per_page: 5
+            });
+            if (response.data.workflow_runs.length === 0) {
+              core.warning('No main Pages workflow runs were found.');
+            }
+            for (const run of response.data.workflow_runs) {
+              console.log(JSON.stringify({
+                id: run.id,
+                name: run.name,
+                status: run.status,
+                conclusion: run.conclusion,
+                head_sha: run.head_sha,
+                event: run.event,
+                url: run.html_url,
+                created_at: run.created_at
+              }));
+            }
+
   public-release-gate:
     runs-on: ubuntu-latest
     env:
